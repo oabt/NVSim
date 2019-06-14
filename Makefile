@@ -1,7 +1,7 @@
 # Non-volatile memory simulator
 # Pre-release version, r131
 
-target := nvsim
+target := nvsim.exe
 
 # define tool chain
 CXX := g++
@@ -21,6 +21,7 @@ INC :=
 DBG :=
 OBJ := $(SRC:.cpp=.o)
 DEP := Makefile.dep
+dep_file := Makefile.dep
 
 # file disambiguity is achieved via the .PHONY directive
 .PHONY : all clean dbg
