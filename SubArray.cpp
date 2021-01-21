@@ -360,6 +360,14 @@ void SubArray::Initialize(long long _numRow, long long _numColumn, bool _multipl
 		capWordline += CalculateGateCap(tech->featureSize, *tech) * numColumn * cell->gateCouplingRatio / (cell->gateCouplingRatio + 1);
 		capBitline  += capCellAccess * (numRow / pageCount) / 2;	/* 2 is due to shared contact and the effective row count is numRow/pageCount */
 		voltagePrecharge = tech->vdd * 0.6;	/* SLC NAND flash bitline precharge voltage is assumed to 0.6Vdd */
+	} else if (cell->memCellType == Customized) { // 3T C2FeRAM
+		resCellAccess = CalculateOnResistance(cell->widthAccessCMOS * tech->featureSize, NMOS, inputParameter->temperature, *tech);
+		capCellAccess = CalculateDrainCap(cell->widthAccessCMOS * tech->featureSize, NMOS, cell->widthInFeatureSize * tech->featureSize, *tech);
+		capWordline += CalculateGateCap(cell->widthAccessCMOS * tech->featureSize, *tech) * numColumn;
+        capWordline += 0 * numColumn; // TODO: value normal Cap
+        capBitline += capCellAccess * numRow / 2;
+        voltagePrecharge = tech->vdd;
+		// TO-DO
 	} else {	/* MLC NAND flash */
 		// TO-DO
 	}
@@ -654,6 +662,14 @@ void SubArray::CalculateLatency(double _rampInput) {
 			setLatency = MAX(rowDecoder.readLatency, columnDecoderLatency + chargeLatency) + cell->flashProgramTime;
 			/* use the programming latency as the write latency for SLC NAND*/
 			writeLatency = setLatency;
+		} else if (cell->memCellType == Customized) {
+			double resPullDown = CalculateOnResistance(cell->widthSRAMCellNMOS * tech->featureSize, NMOS,
+					inputParameter->temperature, *tech);
+			double tau = (resCellAccess + resPullDown) * (capCellAccess + capBitline + bitlineMux.capForPreviousDelayCalculation)
+					+ resBitline * (bitlineMux.capForPreviousDelayCalculation + capBitline / 2);
+            tau *= log(2); //TODO the sensible voltage drop
+            writeLatency = 0; //TODO the write latency
+
 		} else {	/* MLC NAND */
 			/* TO-DO */
 		}
