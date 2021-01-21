@@ -124,8 +124,10 @@ void MemCell::ReadCellFromFile(const string & inputFile)
 				memCellType = memristor;
 			else if (!strcmp(tmp, "SLCNAND"))
 				memCellType = SLCNAND;
-			else
+			else if (!strcmp(tmp, "MLCNAND"))
 				memCellType = MLCNAND;
+			else
+				memCellType = Customized;
 			continue;
 		}
 		if (!strncmp("-ProcessNode", line, strlen("-ProcessNode"))) {

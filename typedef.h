@@ -48,7 +48,8 @@ enum MemCellType
 	memristor,
 	FBRAM,
 	SLCNAND,
-	MLCNAND
+	MLCNAND,
+    Customized
 };
 enum CellAccessType
 {
